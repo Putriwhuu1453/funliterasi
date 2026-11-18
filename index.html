@@ -1,0 +1,2347 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChemPlast Lab — Misi Kimia Mengungkap Mikroplastik (SMA Kelas X)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=JetBrains+Mono:wght@500;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    /* ==========================================================================
+       1. DESIGN TOKENS — CUTE PASTEL CHEMISTRY LAB ("GEMAS")
+    ========================================================================== */
+    :root {
+      --bg-lavender: #F3E8FF;
+      --bg-mint: #CCFBF1;
+      --bg-sky: #E0F2FE;
+      --bg-cream: #FEF9C3;
+      --card-glass: rgba(255, 255, 255, 0.94);
+      --card-border: #DDD6FE;
+
+      --purple-600: #7C3AED;
+      --purple-500: #8B5CF6;
+      --purple-100: #EDE9FE;
+
+      --teal-600: #0D9488;
+      --teal-500: #14B8A6;
+      --teal-100: #CCFBF1;
+
+      --sky-600: #0284C7;
+      --sky-500: #0EA5E9;
+      --sky-100: #E0F2FE;
+
+      --coral-600: #EA580C;
+      --coral-500: #F97316;
+      --coral-100: #FFEDD5;
+
+      --pink-500: #EC4899;
+      --pink-100: #FCE7F3;
+
+      --ink-900: #1E1B4B;
+      --ink-700: #334155;
+      --ink-500: #64748B;
+
+      --font-cute: 'Fredoka', cursive, sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-chem: 'JetBrains Mono', monospace;
+      --shadow-soft: 0 14px 34px -8px rgba(124, 58, 237, 0.14);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink-900);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 15%, var(--bg-lavender) 0%, transparent 42%),
+        radial-gradient(circle at 88% 20%, var(--bg-mint) 0%, transparent 45%),
+        radial-gradient(circle at 20% 85%, var(--bg-cream) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, var(--bg-sky) 0%, transparent 48%),
+        #F8FAFC;
+      background-attachment: fixed;
+      line-height: 1.72;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       2. HIGH-CONTRAST READABLE CHEMICAL FORMULA STYLING (<sub> & <sup>)
+    ========================================================================== */
+    .chem-inline {
+      display: inline-block;
+      font-family: var(--font-chem);
+      font-size: 0.92em;
+      font-weight: 700;
+      color: #312E81;
+      background: #EEF2FF;
+      border: 1.5px solid #C7D2FE;
+      padding: 0.08rem 0.45rem;
+      border-radius: 8px;
+      line-height: 1.45;
+      vertical-align: baseline;
+      letter-spacing: 0.01em;
+    }
+
+    .chem-inline sub,
+    .chem-equation-box sub,
+    .chem-formula-pill sub,
+    .poly-card sub,
+    .match-tile sub {
+      font-size: 0.74em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+      bottom: -0.24em;
+      font-weight: 800;
+    }
+
+    .chem-inline sup,
+    .chem-equation-box sup,
+    .chem-formula-pill sup,
+    .poly-card sup,
+    .match-tile sup {
+      font-size: 0.74em;
+      line-height: 0;
+      position: relative;
+      vertical-align: baseline;
+      top: -0.45em;
+      font-weight: 800;
+    }
+
+    .chem-equation-box {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      color: #F8FAFC;
+      border: 2.5px solid #A78BFA;
+      border-radius: 16px;
+      padding: 0.95rem 1.2rem;
+      margin: 0.85rem 0;
+      font-family: var(--font-chem);
+      font-size: 0.92rem;
+      line-height: 1.85;
+      box-shadow: 0 8px 20px rgba(30, 27, 75, 0.16);
+      overflow-x: auto;
+    }
+
+    .chem-equation-box .eq-label {
+      display: block;
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #5EEAD4;
+      margin-bottom: 0.35rem;
+    }
+
+    .chem-equation-box .eq-highlight {
+      color: #FDE047;
+      font-weight: 800;
+    }
+
+    .chem-equation-box .eq-radical {
+      color: #FDA4AF;
+      font-weight: 800;
+    }
+
+    h1, h2, h3, h4, .font-cute {
+      font-family: var(--font-cute);
+      letter-spacing: 0.01em;
+    }
+
+    /* ==========================================================================
+       3. WELCOME OVERLAY (PAGE 0: STUDENT IDENTITY ENTRY)
+    ========================================================================== */
+    .welcome-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background:
+        radial-gradient(circle at 18% 20%, #EDE9FE 0%, transparent 50%),
+        radial-gradient(circle at 82% 80%, #CCFBF1 0%, transparent 50%),
+        rgba(248, 250, 252, 0.96);
+      backdrop-filter: blur(10px);
+      transition: opacity 0.45s ease, visibility 0.45s ease;
+    }
+
+    .welcome-overlay.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .welcome-card {
+      width: 100%;
+      max-width: 540px;
+      background: #FFFFFF;
+      border: 3px solid #DDD6FE;
+      border-radius: 30px;
+      padding: 2.1rem 1.85rem;
+      text-align: center;
+      box-shadow: 0 24px 54px -12px rgba(124, 58, 237, 0.24);
+      animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .welcome-pill {
+      display: inline-block;
+      background: var(--purple-100);
+      color: var(--purple-600);
+      font-weight: 800;
+      font-size: 0.78rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.03em;
+    }
+
+    .welcome-form {
+      display: grid;
+      gap: 0.85rem;
+      text-align: left;
+      margin-top: 1.25rem;
+    }
+
+    .cute-input-group label {
+      display: block;
+      font-weight: 800;
+      font-size: 0.84rem;
+      color: var(--ink-900);
+      margin-bottom: 0.3rem;
+    }
+
+    .cute-input {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      border-radius: 14px;
+      border: 2px solid #DDD6FE;
+      background: #FAF5FF;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--ink-900);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .cute-input:focus {
+      border-color: var(--purple-600);
+      background: #FFFFFF;
+      box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.14);
+    }
+
+    /* ==========================================================================
+       4. STICKY TOP HUD & 6-STAGE GATED STEPPER BAR
+    ========================================================================== */
+    .top-hud-wrapper {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 2px solid #EDE9FE;
+      padding: 0.7rem 1rem;
+    }
+
+    .top-hud-inner {
+      max-width: 1040px;
+      margin: 0 auto;
+      display: grid;
+      gap: 0.65rem;
+    }
+
+    .hud-brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-family: var(--font-cute);
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--purple-600);
+    }
+
+    .hud-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      flex-wrap: wrap;
+    }
+
+    .student-tag {
+      background: #F8FAFC;
+      border: 2px solid #E2E8F0;
+      border-radius: 999px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ink-700);
+    }
+
+    .score-pill {
+      background: linear-gradient(135deg, #FEF08A 0%, #FDE047 100%);
+      border: 2px solid #F59E0B;
+      border-radius: 999px;
+      padding: 0.3rem 0.9rem;
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: #78350F;
+      box-shadow: 0 4px 10px rgba(245, 158, 11, 0.2);
+    }
+
+    /* 6-Stage Stepper Pills */
+    .stepper-bar {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.45rem;
+    }
+
+    .step-pill {
+      border: 2px solid #E2E8F0;
+      background: #F1F5F9;
+      color: var(--ink-500);
+      font-family: var(--font-body);
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 0.45rem 0.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .step-pill.unlocked {
+      background: #FFFFFF;
+      border-color: #C4B5FD;
+      color: var(--purple-600);
+    }
+
+    .step-pill.active {
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      border-color: var(--purple-600);
+      color: #FFFFFF;
+      box-shadow: 0 6px 14px rgba(124, 58, 237, 0.28);
+      transform: translateY(-1px);
+    }
+
+    .step-pill.completed {
+      background: var(--teal-100);
+      border-color: var(--teal-500);
+      color: var(--teal-600);
+    }
+
+    .step-pill.locked {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    /* ==========================================================================
+       5. MAIN STAGE, GLASS CARDS, BUTTONS & INTERACTIVE MODULES
+    ========================================================================== */
+    .main-stage {
+      max-width: 1040px;
+      margin: 1.5rem auto 3.5rem;
+      padding: 0 1rem;
+    }
+
+    .lab-page {
+      display: none;
+      animation: fadeSlideUp 0.35s ease;
+    }
+
+    .lab-page.active {
+      display: grid;
+      gap: 1.35rem;
+    }
+
+    .glass-card {
+      background: var(--card-glass);
+      border: 2.5px solid var(--card-border);
+      border-radius: var(--radius-xl);
+      padding: 1.65rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .page-header-banner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      padding-bottom: 1rem;
+      margin-bottom: 1.15rem;
+      border-bottom: 2px dashed #DDD6FE;
+    }
+
+    .page-kicker {
+      display: inline-block;
+      background: var(--purple-100);
+      color: var(--purple-600);
+      font-size: 0.76rem;
+      font-weight: 800;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      margin-bottom: 0.35rem;
+    }
+
+    .page-header-banner h2 {
+      font-size: 1.5rem;
+      color: var(--ink-900);
+      line-height: 1.25;
+    }
+
+    .chem-formula-pill {
+      background: #EEF2FF;
+      border: 2px solid #C7D2FE;
+      color: #312E81;
+      font-family: var(--font-chem);
+      font-size: 0.82rem;
+      font-weight: 800;
+      padding: 0.45rem 0.85rem;
+      border-radius: 14px;
+    }
+
+    /* Cute Tabs (Page 1) */
+    .cute-tabs {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .cute-tab-btn {
+      border: 2px solid #DDD6FE;
+      background: #FAF5FF;
+      color: var(--ink-700);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 800;
+      padding: 0.6rem 1.1rem;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .cute-tab-btn.active {
+      background: var(--purple-600);
+      border-color: var(--purple-600);
+      color: #FFFFFF;
+      box-shadow: 0 6px 14px rgba(124, 58, 237, 0.24);
+    }
+
+    .tab-content-panel {
+      background: #FFFFFF;
+      border: 2px solid #EDE9FE;
+      border-radius: var(--radius-lg);
+      padding: 1.2rem;
+    }
+
+    /* Gate Challenge Box */
+    .gate-box {
+      background: linear-gradient(135deg, #FAF5FF 0%, #F0FDFA 100%);
+      border: 2.5px solid #C4B5FD;
+      border-radius: var(--radius-xl);
+      padding: 1.55rem;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .gate-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .gate-title {
+      font-size: 1.18rem;
+      color: var(--purple-600);
+    }
+
+    .gate-status-badge {
+      background: #FEF3C7;
+      border: 2px solid #F59E0B;
+      color: #92400E;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.3rem 0.8rem;
+      border-radius: 999px;
+    }
+
+    .gate-status-badge.unlocked {
+      background: #DCFCE7;
+      border-color: #22C55E;
+      color: #166534;
+    }
+
+    /* Sort Cards (Page 1) */
+    .sort-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .sort-item-card {
+      background: #FFFFFF;
+      border: 2px solid #DDD6FE;
+      border-radius: 16px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .sort-item-card.done {
+      background: #F0FDF4;
+      border-color: #22C55E;
+    }
+
+    .sort-btn-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.45rem;
+    }
+
+    .mini-choice-btn {
+      border: 2px solid #CBD5E1;
+      background: #F8FAFC;
+      color: var(--ink-900);
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.5rem 0.65rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .mini-choice-btn:hover:not(:disabled) {
+      border-color: var(--purple-500);
+      background: #F3E8FF;
+      transform: translateY(-1px);
+    }
+
+    .mini-choice-btn:disabled {
+      cursor: default;
+      opacity: 0.85;
+    }
+
+    /* 6 Shapes Grid (Page 2) */
+    .shapes-5-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .shape-mini-card {
+      background: #FFFFFF;
+      border: 2px solid #E0E7FF;
+      border-radius: 18px;
+      padding: 0.95rem 0.8rem;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+
+    .shape-mini-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--purple-500);
+    }
+
+    .scope-circle {
+      width: 74px;
+      height: 74px;
+      margin: 0 auto 0.55rem;
+      border-radius: 50%;
+      background: radial-gradient(circle, #1E1B4B 0%, #0F172A 100%);
+      border: 3px solid #A78BFA;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.35);
+    }
+
+    .shape-mini-card h4 {
+      font-size: 0.95rem;
+      color: var(--ink-900);
+      margin-bottom: 0.25rem;
+    }
+
+    /* 6 Polymers Grid (Page 2) */
+    .polymers-6-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 0.9rem;
+    }
+
+    .poly-card {
+      background: #FFFFFF;
+      border: 2px solid #DDD6FE;
+      border-radius: 18px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .resin-badge {
+      align-self: flex-start;
+      background: var(--purple-100);
+      color: var(--purple-600);
+      font-family: var(--font-chem);
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.22rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .density-tag {
+      margin-top: auto;
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 0.3rem 0.65rem;
+      border-radius: 10px;
+    }
+
+    .density-sink {
+      background: #FFEDD5;
+      color: #9A3412;
+    }
+
+    .density-float {
+      background: #CCFBF1;
+      color: #115E59;
+    }
+
+    /* Matching Columns (Page 2 Gate) */
+    .match-columns {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr;
+      gap: 0.85rem;
+    }
+
+    .match-columns > div {
+      display: grid;
+      gap: 0.55rem;
+    }
+
+    .match-tile {
+      width: 100%;
+      text-align: left;
+      background: #FFFFFF;
+      border: 2px solid #C4B5FD;
+      border-radius: 14px;
+      padding: 0.75rem 0.9rem;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--ink-900);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .match-tile:hover:not(.matched) {
+      background: #FAF5FF;
+      border-color: var(--purple-600);
+    }
+
+    .match-tile.selected {
+      background: #EDE9FE;
+      border-color: var(--purple-600);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    }
+
+    .match-tile.matched {
+      background: #DCFCE7;
+      border-color: #22C55E;
+      color: #166534;
+      cursor: default;
+    }
+
+    /* Case Studies (Page 3) */
+    .case-study-card {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      gap: 1.25rem;
+      align-items: center;
+      background: #FFFFFF;
+      border: 2.5px solid #E2E8F0;
+      border-radius: 20px;
+      padding: 1.1rem;
+      margin-bottom: 1rem;
+      cursor: pointer;
+      transition: all 0.22s ease;
+    }
+
+    .case-study-card:hover {
+      border-color: var(--purple-500);
+      transform: translateY(-2px);
+    }
+
+    .case-study-card.inspected {
+      border-color: #22C55E;
+      background: #F0FDF4;
+    }
+
+    .case-svg-box {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 2px solid #1E293B;
+      background: #0F172A;
+    }
+
+    .chem-reaction-box {
+      margin-top: 0.65rem;
+      background: #F8FAFC;
+      border-left: 4px solid var(--purple-600);
+      padding: 0.65rem 0.85rem;
+      border-radius: 0 12px 12px 0;
+      font-size: 0.85rem;
+      color: var(--ink-900);
+    }
+
+    .order-item-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      background: #FFFFFF;
+      border: 2px solid #DDD6FE;
+      border-radius: 14px;
+      padding: 0.65rem 0.9rem;
+      margin-bottom: 0.45rem;
+    }
+
+    /* Organ Toxicology Lab (Page 4) */
+    .organ-lab-grid {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .body-svg-stage {
+      background: linear-gradient(180deg, #FAF5FF 0%, #EEF2FF 100%);
+      border: 2px solid #DDD6FE;
+      border-radius: 20px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .organ-hotspot {
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .organ-hotspot:hover {
+      opacity: 0.85;
+    }
+
+    .organ-pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .organ-btn {
+      border: 2px solid #DDD6FE;
+      background: #FFFFFF;
+      color: var(--ink-700);
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 800;
+      padding: 0.45rem 0.8rem;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+
+    .organ-btn.visited {
+      border-color: var(--teal-500);
+    }
+
+    .organ-btn.active {
+      background: var(--purple-600);
+      border-color: var(--purple-600);
+      color: #FFFFFF;
+    }
+
+    .organ-detail-card {
+      background: #FFFFFF;
+      border: 2px solid #EDE9FE;
+      border-radius: 20px;
+      padding: 1.2rem;
+    }
+
+    /* Newspaper Article (Page 5) */
+    .newspaper-article {
+      background: #FFFFFF;
+      border: 2px solid #CBD5E1;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+
+    .news-masthead {
+      background: linear-gradient(135deg, #1E1B4B 0%, #312E81 100%);
+      color: #FFFFFF;
+      padding: 1.25rem 1.4rem;
+    }
+
+    .news-body {
+      padding: 1.35rem 1.4rem;
+      display: grid;
+      gap: 0.85rem;
+      font-size: 0.94rem;
+      color: var(--ink-700);
+    }
+
+    /* Certificate Frame (Page 6) */
+    .cert-frame {
+      background: linear-gradient(135deg, #FFFBEB 0%, #FFFFFF 45%, #F0FDFA 100%);
+      border: 4px double #F59E0B;
+      border-radius: 28px;
+      padding: 2.2rem 1.65rem;
+      text-align: center;
+      box-shadow: 0 20px 44px rgba(245, 158, 11, 0.16);
+    }
+
+    .cert-name {
+      font-family: var(--font-cute);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--purple-600);
+      margin: 0.35rem 0 0.15rem;
+      text-decoration: underline wavy #F59E0B;
+      text-underline-offset: 6px;
+    }
+
+    /* Bouncy Buttons & Footer Nav */
+    .btn-bouncy {
+      border: none;
+      background: linear-gradient(135deg, var(--purple-600), var(--purple-500));
+      color: #FFFFFF;
+      font-family: var(--font-cute);
+      font-size: 0.98rem;
+      font-weight: 600;
+      padding: 0.72rem 1.35rem;
+      border-radius: 16px;
+      cursor: pointer;
+      box-shadow: 0 6px 0 #5B21B6, 0 10px 20px rgba(124, 58, 237, 0.25);
+      transition: transform 0.14s ease, box-shadow 0.14s ease, opacity 0.2s;
+    }
+
+    .btn-bouncy:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .btn-bouncy:active:not(:disabled) {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #5B21B6;
+    }
+
+    .btn-bouncy.teal {
+      background: linear-gradient(135deg, var(--teal-600), var(--teal-500));
+      box-shadow: 0 6px 0 #115E59, 0 10px 20px rgba(13, 148, 136, 0.25);
+    }
+
+    .btn-bouncy.teal:active:not(:disabled) {
+      box-shadow: 0 2px 0 #115E59;
+    }
+
+    .btn-bouncy.secondary {
+      background: #E2E8F0;
+      color: var(--ink-900);
+      box-shadow: 0 5px 0 #94A3B8;
+    }
+
+    .btn-bouncy:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .page-nav-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1.35rem;
+      padding-top: 1rem;
+      border-top: 2px dashed #CBD5E1;
+    }
+
+    /* Toast Notification */
+    #toast-msg {
+      position: fixed;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(120%);
+      z-index: 1200;
+      padding: 0.75rem 1.35rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.88rem;
+      color: #FFFFFF;
+      background: #1E1B4B;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 92vw;
+      text-align: center;
+    }
+
+    #toast-msg.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    #toast-msg.good {
+      background: linear-gradient(135deg, #0D9488, #16A34A);
+    }
+
+    #toast-msg.warn {
+      background: linear-gradient(135deg, #EA580C, #DC2626);
+    }
+
+    /* Animations */
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .wiggle {
+      animation: wiggleAnim 0.35s ease;
+    }
+
+    @keyframes wiggleAnim {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    /* Responsive Rules */
+    @media (max-width: 820px) {
+      .case-study-card,
+      .organ-lab-grid,
+      .match-columns {
+        grid-template-columns: 1fr;
+      }
+
+      .stepper-bar {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF !important;
+      }
+      .top-hud-wrapper,
+      .no-print,
+      #p6-eval-card,
+      #toast-msg {
+        display: none !important;
+      }
+      .cert-frame {
+        border: 4px solid #F59E0B;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================================
+       HALAMAN 0: LAYAR SELAMAT DATANG & IDENTITAS PRAKTIKAN
+  ========================================================================== -->
+  <div class="welcome-overlay" id="welcome-screen">
+    <div class="welcome-card">
+      <div style="font-size: 3.1rem; margin-bottom: 0.35rem;">🧪🔬🌊</div>
+      <span class="welcome-pill">LABORATORIUM VIRTUAL KIMIA • SMA KELAS X</span>
+      <h1 style="font-size: 1.75rem; color: var(--ink-900); line-height: 1.25; margin-bottom: 0.5rem;">
+        ChemPlast Lab: Misi Kimia Mengungkap Mikroplastik
+      </h1>
+      <p style="font-size: 0.9rem; color: var(--ink-700);">
+        Selidiki struktur polimer plastik, mekanisme degradasi kimia, dampak biokimia pada tubuh manusia, hingga raih <strong>Sertifikat Praktikan Kimia Lingkungan</strong>!
+      </p>
+
+      <form class="welcome-form" id="entry-form">
+        <div class="cute-input-group">
+          <label for="student-name-input">👩‍🔬 Nama Lengkap Praktikan</label>
+          <input type="text" id="student-name-input" class="cute-input" placeholder="Contoh: Nabila Azzahra" required />
+        </div>
+        <div class="cute-input-group">
+          <label for="student-class-input">🏫 Kelas</label>
+          <input type="text" id="student-class-input" class="cute-input" placeholder="Contoh: X IPA 2 / X-4" required />
+        </div>
+        <button type="submit" class="btn-bouncy" style="width: 100%; margin-top: 0.35rem; font-size: 1.05rem;">
+          Mulai Investigasi Kimia 🚀
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST FEEDBACK -->
+  <div id="toast-msg" role="status" aria-live="polite"></div>
+
+  <!-- =========================================================================
+       STICKY HUD BAR & 6-STAGE GATED NAVIGATION
+  ========================================================================== -->
+  <header class="top-hud-wrapper">
+    <div class="top-hud-inner">
+      <div class="hud-brand-row">
+        <div class="brand-title">
+          <span>🧪</span>
+          <span>ChemPlast Lab</span>
+        </div>
+        <div class="hud-badges">
+          <span class="student-tag" id="hud-name-class">👩‍🔬 Siswa SMA Kelas X</span>
+          <span class="score-pill">⭐ <span id="hud-points">0</span> Poin Kimia</span>
+        </div>
+      </div>
+      <nav class="stepper-bar" id="stepper-nav" aria-label="Tahapan Praktikum"></nav>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       MAIN STAGE: 6 GATED STAGES AFTER PAGE 0 WELCOME
+  ========================================================================== -->
+  <main class="main-stage">
+
+    <!-- =======================================================================
+         HALAMAN 1: MIKROPLASTIK PRIMER VS SEKUNDER & KIMIA POLIMER
+    ======================================================================== -->
+    <section class="lab-page active" id="page-1">
+      <div class="glass-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 1 dari 6 • Dasar Kimia Polimer</span>
+            <h2>Mikroplastik Primer vs. Sekunder</h2>
+          </div>
+          <div class="chem-formula-pill">Ukuran Partikel: &lt; 5 mm (1 &mu;m &ndash; 5.000 &mu;m)</div>
+        </div>
+
+        <p style="margin-bottom: 1rem; color: var(--ink-700);">
+          Dari sudut pandang <strong>Ilmu Kimia</strong>, plastik adalah <strong>makromolekul polimer organik sintetis</strong> yang tersusun dari ribuan unit monomer berulang melalui reaksi <em>polimerisasi adisi</em> maupun <em>kondensasi</em>. Rantai utamanya didominasi oleh <strong>ikatan kovalen karbon-karbon (<span class="chem-inline">C&minus;C</span>) dan karbon-hidrogen (<span class="chem-inline">C&minus;H</span>)</strong> yang sangat stabil serta bersifat hidrofobik (non-polar), sehingga enzim mikroorganisme sulit memutusnya secara alami.
+        </p>
+
+        <div class="cute-tabs">
+          <button class="cute-tab-btn active" id="p1-tab-btn-0" onclick="switchP1Tab(0)">🔵 1. Mikroplastik Primer</button>
+          <button class="cute-tab-btn" id="p1-tab-btn-1" onclick="switchP1Tab(1)">🟠 2. Mikroplastik Sekunder &amp; Reaksi Fotodegradasi</button>
+        </div>
+
+        <div class="tab-content-panel" id="p1-tab-0">
+          <h3 style="color: var(--sky-600); margin-bottom: 0.45rem;">Mikroplastik Primer (Sengaja Diproduksi Berukuran Mikro)</h3>
+          <p style="font-size: 0.92rem; margin-bottom: 0.75rem;">
+            Partikel polimer yang sejak awal dirancang di pabrik dengan diameter kurang dari <strong>5 mm</strong> untuk fungsi kimia dan fisik tertentu:
+          </p>
+          <ul style="padding-left: 1.25rem; font-size: 0.9rem; color: var(--ink-700); display: grid; gap: 0.55rem;">
+            <li><strong>Microbeads (Butiran Abrasif):</strong> Butiran polietilena (<span class="chem-inline">PE</span>) atau polipropilena (<span class="chem-inline">PP</span>) dalam sabun cuci muka <em>scrub</em>, pasta gigi pemutih, dan lulur yang lolos saringan instalasi pengolahan air limbah (IPAL).</li>
+            <li><strong>Resin Pellets (Nurdles):</strong> Biji plastik silinder kecil bahan baku industri pencetakan plastik yang sering tumpah saat distribusi logistik ke perairan.</li>
+          </ul>
+        </div>
+
+        <div class="tab-content-panel" id="p1-tab-1" style="display: none;">
+          <h3 style="color: var(--coral-600); margin-bottom: 0.45rem;">Mikroplastik Sekunder (Hasil Fragmentasi Kimia &amp; Fisika)</h3>
+          <p style="font-size: 0.92rem; margin-bottom: 0.75rem;">
+            Terbentuk ketika sampah plastik besar (makroplastik) mengalami pemutusan rantai polimer menjadi serpihan mikroskopis akibat energi cahaya, panas, air, dan gesekan:
+          </p>
+          <ul style="padding-left: 1.25rem; font-size: 0.9rem; color: var(--ink-700); display: grid; gap: 0.55rem;">
+            <li><strong>Fotodegradasi Sinar UV &amp; Radikal Bebas:</strong> Foton UV berenergi tinggi (<span class="chem-inline">h&nu;</span>) memutus ikatan kovalen polimer (<span class="chem-inline">R&minus;H</span>) membentuk radikal bebas alkil (<span class="chem-inline">R&bull;</span>), radikal peroksil (<span class="chem-inline">ROO&bull;</span>), serta gugus karbonil (<span class="chem-inline">C=O</span>) yang membuat plastik rapuh.</li>
+            <li><strong>Hidrolisis Ikatan Ester:</strong> Molekul air (<span class="chem-inline">H<sub>2</sub>O</span>) dan kalor memutus ikatan ester (<span class="chem-inline">&minus;COO&minus;</span>) pada polimer kondensasi seperti PET.</li>
+            <li><strong>Abrasi Mekanis:</strong> Gesekan pisau pada talenan plastik, gesekan ban kendaraan di aspal, dan putaran mesin cuci pada serat poliester.</li>
+          </ul>
+
+          <div class="chem-equation-box">
+            <span class="eq-label">⚗️ Mekanisme Reaksi Fotodegradasi &amp; Pembentukan Radikal Bebas Polimer</span>
+            1. Inisiasi UV: &nbsp;<span class="eq-highlight">R&minus;H</span> + energi foton (<span class="eq-highlight">h&nu;</span>) &rarr; <span class="eq-radical">R&bull;</span> (radikal alkil) + <span class="eq-radical">H&bull;</span><br />
+            2. Propagasi O<sub>2</sub>: <span class="eq-radical">R&bull;</span> + <span class="eq-highlight">O<sub>2</sub></span> &rarr; <span class="eq-radical">ROO&bull;</span> (radikal peroksil)<br />
+            3. Abstraksi H: &nbsp;&nbsp;<span class="eq-radical">ROO&bull;</span> + <span class="eq-highlight">R&minus;H</span> &rarr; <span class="eq-highlight">ROOH</span> + <span class="eq-radical">R&bull;</span> &rarr; pemutusan rantai polimer + <span class="eq-radical">&bull;OH</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GATE CHALLENGE PAGE 1 -->
+      <div class="gate-box">
+        <div class="gate-header">
+          <h3 class="gate-title">🔐 Tantangan Pembuka Halaman 2: Klasifikasi Primer vs. Sekunder</h3>
+          <span class="gate-status-badge" id="p1-gate-badge">Wajib Selesai (0/4)</span>
+        </div>
+        <p style="font-size: 0.88rem; margin-bottom: 1rem;">
+          Kelompokkan keempat sumber mikroplastik di bawah ini dengan tepat! (Jawaban benar = <strong>+20 Poin</strong>, salah = +0 poin).
+        </p>
+        <div class="sort-cards-grid" id="p1-sort-grid"></div>
+
+        <div class="page-nav-footer">
+          <span style="font-size: 0.84rem; font-weight: 700; color: var(--ink-500);">Halaman 1 dari 6</span>
+          <button class="btn-bouncy teal" id="btn-next-1" disabled onclick="goToPage(2)">
+            Lanjut ke Halaman 2: Bentuk &amp; Polimer ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         HALAMAN 2: BENTUK FISIK (6) & JENIS POLIMER KIMIA PLASTIK (1-6)
+    ======================================================================== -->
+    <section class="lab-page" id="page-2">
+      <div class="glass-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 2 dari 6 • Morfologi &amp; Struktur Polimer</span>
+            <h2>6 Bentuk Fisik &amp; 6 Jenis Polimer Kimia Plastik</h2>
+          </div>
+          <div class="chem-formula-pill">Massa Jenis Air (&rho;<sub>air</sub>) = 1,00 g/cm<sup>3</sup></div>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem; color: var(--ink-900);">🔬 A. 6 Bentuk Fisik Mikroplastik di Bawah Mikroskop</h3>
+        <div class="shapes-5-grid">
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <path d="M12,24 Q30,10 42,32 T56,22" stroke="#F472B6" stroke-width="3.5" fill="none" stroke-linecap="round" />
+                <path d="M16,44 Q34,54 50,38" stroke="#2DD4BF" stroke-width="3" fill="none" stroke-linecap="round" />
+              </svg>
+            </div>
+            <h4>1. Fiber (Serat)</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Benang halus sintetis dari pakaian poliester/nilon &amp; jaring ikan.</p>
+          </div>
+
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <polygon points="14,18 36,12 32,36 12,30" fill="#F97316" />
+                <polygon points="38,28 54,32 48,50 34,44" fill="#38BDF8" />
+              </svg>
+            </div>
+            <h4>2. Fragment (Serpihan)</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Pecahan kaku tak beraturan dari botol keras &amp; goresan talenan.</p>
+          </div>
+
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <path d="M14,22 Q32,12 52,24 Q46,46 18,42 Z" fill="#C084FC" opacity="0.7" stroke="#F3E8FF" />
+              </svg>
+            </div>
+            <h4>3. Film (Lembaran)</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Sobekan lembaran tipis transparan dari kantong kresek LDPE.</p>
+          </div>
+
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <rect x="18" y="20" width="14" height="10" rx="4" fill="#38BDF8" />
+                <rect x="34" y="32" width="14" height="10" rx="4" fill="#A78BFA" />
+              </svg>
+            </div>
+            <h4>4. Pellet (Nurdles)</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Biji silinder bahan baku pabrik pencetakan plastik industri.</p>
+          </div>
+
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle cx="26" cy="28" r="8" fill="#F8FAFC" />
+                <circle cx="38" cy="30" r="8" fill="#E2E8F0" />
+                <circle cx="32" cy="38" r="8" fill="#F8FAFC" />
+              </svg>
+            </div>
+            <h4>5. Foam (Busa)</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Butiran berpori ringan dari wadah styrofoam (polistirena).</p>
+          </div>
+
+          <div class="shape-mini-card">
+            <div class="scope-circle">
+              <svg width="64" height="64" viewBox="0 0 64 64">
+                <circle cx="23" cy="24" r="6.5" fill="#34D399" />
+                <circle cx="42" cy="25" r="6" fill="#FBBF24" />
+                <circle cx="32" cy="42" r="7" fill="#60A5FA" />
+              </svg>
+            </div>
+            <h4>6. Microbeads</h4>
+            <p style="font-size: 0.79rem; color: var(--ink-700);">Butiran bulat mikro dalam sabun scrub wajah &amp; pasta gigi.</p>
+          </div>
+        </div>
+
+        <h3 style="margin-bottom: 0.75rem; color: var(--ink-900);">🧪 B. 6 Jenis Polimer Utama (Kode Resin 1&ndash;6) &amp; Struktur Kimianya</h3>
+        <div class="polymers-6-grid">
+          <div class="poly-card">
+            <span class="resin-badge">Kode #1 &bull; PET</span>
+            <h4>Polietilena Tereftalat</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>10</sub>H<sub>8</sub>O<sub>4</sub>)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Memiliki gugus fungsi <strong>ester (<span class="chem-inline">&minus;COO&minus;</span>)</strong> yang mudah terhidrolisis saat dipanaskan. Bahan botol air mineral.</p>
+            <span class="density-tag density-sink">&rho; &approx; 1,38 g/cm<sup>3</sup> &rarr; Tenggelam ke sedimen</span>
+          </div>
+
+          <div class="poly-card">
+            <span class="resin-badge">Kode #2 &bull; HDPE</span>
+            <h4>High-Density Polyethylene</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>2</sub>H<sub>4</sub>)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Rantai karbon lurus rapat dengan ikatan <span class="chem-inline">C&minus;C</span> dan <span class="chem-inline">C&minus;H</span> non-polar. Bahan talenan plastik &amp; botol sampo.</p>
+            <span class="density-tag density-float">&rho; &approx; 0,95 g/cm<sup>3</sup> &rarr; Mengapung di permukaan</span>
+          </div>
+
+          <div class="poly-card">
+            <span class="resin-badge">Kode #3 &bull; PVC</span>
+            <h4>Polivinil Klorida</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>2</sub>H<sub>3</sub>Cl)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Mengandung atom <strong>klorin (<span class="chem-inline">Cl</span>)</strong> dan aditif pelentur <strong>ftalat</strong> berbahaya. Bahan pipa &amp; plastik pembungkus.</p>
+            <span class="density-tag density-sink">&rho; &approx; 1,38 g/cm<sup>3</sup> &rarr; Tenggelam di perairan</span>
+          </div>
+
+          <div class="poly-card">
+            <span class="resin-badge">Kode #4 &bull; LDPE</span>
+            <h4>Low-Density Polyethylene</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>2</sub>H<sub>4</sub>)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Rantai karbon bercabang sehingga strukturnya fleksibel dan tipis. Bahan kantong kresek &amp; plastik kemasan.</p>
+            <span class="density-tag density-float">&rho; &approx; 0,92 g/cm<sup>3</sup> &rarr; Mengapung &amp; terbawa arus</span>
+          </div>
+
+          <div class="poly-card">
+            <span class="resin-badge">Kode #5 &bull; PP</span>
+            <h4>Polipropilena</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>3</sub>H<sub>6</sub>)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Memiliki gugus cabang <strong>metil (<span class="chem-inline">&minus;CH<sub>3</sub></span>)</strong>. Bahan wadah bekal, gelas minuman, &amp; talenan yang sering tergores mekanis.</p>
+            <span class="density-tag density-float">&rho; &approx; 0,90 g/cm<sup>3</sup> &rarr; Mengapung (paling ringan)</span>
+          </div>
+
+          <div class="poly-card">
+            <span class="resin-badge">Kode #6 &bull; PS</span>
+            <h4>Polistirena (Styrofoam)</h4>
+            <div style="margin: 0.35rem 0;">Rumus Unit: <span class="chem-inline">(C<sub>8</sub>H<sub>8</sub>)<sub>n</sub></span></div>
+            <p style="font-size: 0.84rem; color: var(--ink-700);">Mengandung <strong>cincin benzena aromatik (<span class="chem-inline">&minus;C<sub>6</sub>H<sub>5</sub></span>)</strong>. Melepaskan monomer stirena saat terkena makanan panas.</p>
+            <span class="density-tag density-sink">&rho; &approx; 1,05 g/cm<sup>3</sup> (padat) / busa mengapung</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- GATE CHALLENGE PAGE 2: MATCHING RESIN, FORMULA & PROPERTIES -->
+      <div class="gate-box">
+        <div class="gate-header">
+          <h3 class="gate-title">🔐 Tantangan Pembuka Halaman 3: Jodohkan Polimer &amp; Rumus Kimianya</h3>
+          <span class="gate-status-badge" id="p2-gate-badge">Wajib Selesai (0/4)</span>
+        </div>
+        <p style="font-size: 0.88rem; margin-bottom: 1rem;">
+          Klik kartu <strong>Kode Polimer</strong> di kolom kiri, lalu klik pasangan <strong>Rumus Kimia &amp; Sifatnya</strong> di kolom kanan (+20 Poin/pasangan):
+        </p>
+        <div class="match-columns">
+          <div id="p2-match-left"></div>
+          <div id="p2-match-right"></div>
+        </div>
+
+        <div class="page-nav-footer">
+          <button class="btn-bouncy secondary" onclick="goToPage(1)">⬅️ Kembali</button>
+          <button class="btn-bouncy teal" id="btn-next-2" disabled onclick="goToPage(3)">
+            Lanjut ke Halaman 3: 3 Studi Kasus Kimia ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         HALAMAN 3: 3 STUDI KASUS KIMIA SEHARI-HARI (ILUSTRASI SVG REALISTIS)
+    ======================================================================== -->
+    <section class="lab-page" id="page-3">
+      <div class="glass-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 3 dari 6 • Fenomena Kimia Lingkungan</span>
+            <h2>3 Studi Kasus Kimia Mikroplastik di Sekitar Kita</h2>
+          </div>
+          <div class="chem-formula-pill" id="p3-inspect-counter">Diinspeksi: 0 / 3 Kasus</div>
+        </div>
+        <p style="margin-bottom: 1.15rem; font-size: 0.92rem; color: var(--ink-700);">
+          Klik masing-masing kartu studi kasus di bawah ini untuk mengamati ilustrasi serta reaksi kimianya secara detail!
+        </p>
+
+        <!-- KASUS 1: BOTOL PLASTIK MENGEMBUN -->
+        <div class="case-study-card" id="case-card-1" onclick="inspectCase(1)">
+          <div class="case-svg-box">
+            <svg viewBox="0 0 380 270" width="100%" height="auto" role="img" aria-label="Ilustrasi Botol Plastik Mengembun Terkena Sinar Matahari">
+              <defs>
+                <linearGradient id="sunHotBg" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stop-color="#FDE047" stop-opacity="0.35" />
+                  <stop offset="55%" stop-color="#FB923C" stop-opacity="0.2" />
+                  <stop offset="100%" stop-color="#0F172A" stop-opacity="0.95" />
+                </linearGradient>
+                <linearGradient id="petGlass" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#E0F2FE" stop-opacity="0.5" />
+                  <stop offset="40%" stop-color="#BAE6FD" stop-opacity="0.16" />
+                  <stop offset="80%" stop-color="#38BDF8" stop-opacity="0.3" />
+                  <stop offset="100%" stop-color="#E0F2FE" stop-opacity="0.55" />
+                </linearGradient>
+              </defs>
+              <rect width="380" height="270" rx="14" fill="url(#sunHotBg)" />
+              <rect x="0" y="226" width="380" height="44" fill="#1E293B" />
+              <!-- Sun -->
+              <circle cx="52" cy="48" r="28" fill="#FACC15" opacity="0.28" />
+              <circle cx="52" cy="48" r="18" fill="#FDE047" />
+              <g stroke="#FDE047" stroke-width="2" stroke-dasharray="5 3">
+                <line x1="78" y1="60" x2="142" y2="95" />
+                <line x1="72" y1="74" x2="138" y2="120" />
+              </g>
+              <text x="12" y="96" fill="#FDE047" font-size="9.5" font-weight="700">UV + Panas &gt;45&deg;C</text>
+
+              <!-- Bottle -->
+              <g transform="translate(136, 26)">
+                <rect x="26" y="0" width="24" height="12" rx="3" fill="#0284C7" />
+                <path d="M26,24 C14,32 10,42 10,54 L10,184 C10,194 18,200 26,200 L50,200 C58,200 66,194 66,184 L66,54 C66,42 62,32 50,24 Z" fill="url(#petGlass)" stroke="#BAE6FD" stroke-width="1.5" />
+                <!-- Water -->
+                <path d="M11,115 Q38,110 65,115 L65,184 C65,193 58,198 50,198 L26,198 C18,198 11,193 11,184 Z" fill="#0284C7" opacity="0.82" />
+                <!-- Condensation Droplets -->
+                <g fill="#FFFFFF" opacity="0.9">
+                  <circle cx="20" cy="48" r="2" /><circle cx="34" cy="44" r="2.2" /><circle cx="52" cy="50" r="2" />
+                  <circle cx="24" cy="68" r="2.4" /><circle cx="44" cy="65" r="2" /><circle cx="56" cy="74" r="2.3" />
+                  <circle cx="28" cy="88" r="2.2" /><circle cx="48" cy="92" r="2.5" /><circle cx="36" cy="102" r="2" />
+                </g>
+                <!-- Micro-flakes -->
+                <polygon points="22,138 30,134 28,144" fill="#F97316" />
+                <circle cx="48" cy="154" r="2.5" fill="#FDE047" />
+                <path d="M24,172 Q36,165 46,175" stroke="#FB7185" stroke-width="2" fill="none" />
+              </g>
+
+              <!-- Zoom Callout -->
+              <circle cx="295" cy="135" r="50" fill="#081226" stroke="#F97316" stroke-width="2.5" />
+              <line x1="205" y1="150" x2="245" y2="140" stroke="#F97316" stroke-width="2" stroke-dasharray="4 3" />
+              <text x="295" y="106" text-anchor="middle" fill="#FDBA74" font-size="8.2" font-weight="700">AIR TERKONTAMINASI</text>
+              <polygon points="274,128 286,120 284,136" fill="#F97316" />
+              <circle cx="308" cy="128" r="4.5" fill="#FDE047" />
+              <text x="295" y="156" text-anchor="middle" fill="#E2E8F0" font-size="8">Fragmen PET + BPA</text>
+              <text x="295" y="168" text-anchor="middle" fill="#7DD3FC" font-size="8">&amp; Katalis Sb2O3</text>
+            </svg>
+          </div>
+          <div>
+            <span class="page-kicker" style="background: var(--coral-100); color: var(--coral-600);">☀️ Kasus 1 &bull; Klik untuk Tandai Dibaca</span>
+            <h3>Botol Plastik PET Berembun di Bawah Sinar Matahari</h3>
+            <p style="font-size: 0.88rem; color: var(--ink-700);">
+              Air kemasan botol plastik yang tertinggal di mobil terik atau terjemur matahari akan memanas dan membentuk tetesan embun di dinding dalam. Air tersebut berbahaya jika terminum!
+            </p>
+            <div class="chem-reaction-box">
+              <strong>Mekanisme Kimia:</strong> Energi foton UV dan suhu tinggi (<strong>&gt; 45&deg;C</strong>) memicu <em>fotodegradasi</em> dan <em>hidrolisis termal</em> pada gugus ester polimer PET (<span class="chem-inline">(C<sub>10</sub>H<sub>8</sub>O<sub>4</sub>)<sub>n</sub></span>). Proses ini meluruhkan (<em>leaching</em>) ribuan fragmen mikroplastik, aditif Bisfenol A / BPA (<span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>), DEHP/ftalat, serta katalis logam berat antimon trioksida (<span class="chem-inline">Sb<sub>2</sub>O<sub>3</sub></span>) ke dalam air minum.
+            </div>
+          </div>
+        </div>
+
+        <!-- KASUS 2: TALENAN PLASTIK TERGORES -->
+        <div class="case-study-card" id="case-card-2" onclick="inspectCase(2)">
+          <div class="case-svg-box">
+            <svg viewBox="0 0 380 270" width="100%" height="auto" role="img" aria-label="Ilustrasi Talenan Plastik Tergores Pisau">
+              <rect width="380" height="270" rx="14" fill="#0F172A" />
+              <rect x="0" y="190" width="380" height="80" fill="#1E293B" />
+              <!-- Plastic Cutting Board -->
+              <polygon points="30,130 330,115 360,235 15,250" fill="#E2E8F0" stroke="#94A3B8" stroke-width="2" />
+              <polygon points="15,250 360,235 360,246 15,261" fill="#94A3B8" />
+              <!-- Knife Grooves -->
+              <g stroke="#64748B" stroke-width="2">
+                <line x1="85" y1="168" x2="245" y2="158" />
+                <line x1="92" y1="180" x2="255" y2="170" />
+                <line x1="80" y1="194" x2="238" y2="184" />
+                <line x1="105" y1="160" x2="225" y2="205" />
+              </g>
+              <!-- Carrot slices -->
+              <ellipse cx="135" cy="175" rx="18" ry="10" fill="#F97316" />
+              <ellipse cx="168" cy="186" rx="16" ry="9" fill="#EA580C" />
+              <!-- Knife -->
+              <g transform="translate(135, 38) rotate(-14)">
+                <rect x="108" y="34" width="82" height="18" rx="5" fill="#0F172A" stroke="#475569" />
+                <path d="M0,62 C32,66 75,65 110,58 L110,36 L22,36 C8,36 0,48 0,62 Z" fill="#CBD5E1" />
+              </g>
+              <!-- Zoom -->
+              <circle cx="292" cy="64" r="46" fill="#081226" stroke="#38BDF8" stroke-width="2.5" />
+              <line x1="185" y1="165" x2="254" y2="92" stroke="#38BDF8" stroke-width="2" stroke-dasharray="4 3" />
+              <text x="292" y="38" text-anchor="middle" fill="#7DD3FC" font-size="8.5" font-weight="700">SERPIHAN PP / HDPE</text>
+              <path d="M268,62 C280,50 290,62 280,70 Z" fill="#E2E8F0" stroke="#38BDF8" />
+              <path d="M298,56 C310,48 318,62 306,68 Z" fill="#F8FAFC" stroke="#F97316" />
+              <text x="292" y="92" text-anchor="middle" fill="#CBD5E1" font-size="8.5">Menempel pada lemak</text>
+            </svg>
+          </div>
+          <div>
+            <span class="page-kicker" style="background: var(--sky-100); color: var(--sky-600);">🔪 Kasus 2 &bull; Klik untuk Tandai Dibaca</span>
+            <h3>Talenan Plastik PP/HDPE Tergores Pisau Dapur</h3>
+            <p style="font-size: 0.88rem; color: var(--ink-700);">
+              Goresan pisau baja pada talenan plastik mengikis jutaan serpihan mikroplastik setiap tahunnya yang menempel langsung pada bahan makanan.
+            </p>
+            <div class="chem-reaction-box">
+              <strong>Prinsip Kimia (Like Dissolves Like):</strong> Polimer polipropilena (<span class="chem-inline">(C<sub>3</sub>H<sub>6</sub>)<sub>n</sub></span>) dan <span class="chem-inline">HDPE</span> bersifat <strong>hidrofobik (non-polar)</strong>. Serpihan (<em>fragment</em>) mikroplastik yang terkikis pisau mudah berikatan secara hidrofobik dengan molekul lipid/lemak non-polar pada daging, ikan, dan sayuran berminyak sehingga ikut tertelan saat dimasak.
+            </div>
+          </div>
+        </div>
+
+        <!-- KASUS 3: HUJAN MIKROPLASTIK -->
+        <div class="case-study-card" id="case-card-3" onclick="inspectCase(3)">
+          <div class="case-svg-box">
+            <svg viewBox="0 0 380 270" width="100%" height="auto" role="img" aria-label="Ilustrasi Hujan Mengandung Mikroplastik">
+              <rect width="380" height="270" rx="14" fill="#0B172A" />
+              <rect x="0" y="224" width="250" height="46" fill="#1E293B" />
+              <rect x="250" y="224" width="130" height="46" fill="#0284C7" />
+              <rect x="18" y="180" width="30" height="44" fill="#334155" />
+              <rect x="55" y="162" width="38" height="62" fill="#475569" />
+
+              <!-- Updraft -->
+              <path d="M74,155 C70,120 98,100 120,82" stroke="#FB923C" stroke-width="2" fill="none" stroke-dasharray="4 3" />
+              <text x="12" y="138" fill="#FDBA74" font-size="8.5" font-weight="700">Partikel ringan naik</text>
+
+              <!-- Cloud -->
+              <g transform="translate(105, 18)">
+                <path d="M30,54 C10,54 5,32 24,26 C32,6 66,5 76,22 C94,8 125,16 130,35 C150,38 148,58 126,58 L30,58 Z" fill="#CBD5E1" />
+                <text x="78" y="36" text-anchor="middle" fill="#0F172A" font-size="9" font-weight="800">Inti Kondensasi Awan</text>
+                <circle cx="52" cy="47" r="2.8" fill="#F97316" />
+                <circle cx="84" cy="49" r="2.8" fill="#E11D48" />
+                <circle cx="112" cy="46" r="2.8" fill="#0284C7" />
+              </g>
+
+              <!-- Raindrops with microplastics -->
+              <path d="M152,92 C152,92 146,102 152,107 C158,102 152,92 152,92 Z" fill="#38BDF8" />
+              <circle cx="152" cy="101" r="1.7" fill="#F97316" />
+              <path d="M188,114 C188,114 182,124 188,129 C194,124 188,114 188,114 Z" fill="#38BDF8" />
+              <circle cx="188" cy="123" r="1.7" fill="#F97316" />
+              <path d="M222,96 C222,96 216,106 222,111 C228,106 222,96 222,96 Z" fill="#38BDF8" />
+              <circle cx="222" cy="105" r="1.7" fill="#FB7185" />
+
+              <rect x="132" y="156" width="116" height="32" rx="8" fill="#1E3A5F" stroke="#38BDF8" />
+              <text x="190" y="170" text-anchor="middle" fill="#7DD3FC" font-size="8.8" font-weight="700">Hujan Mikroplastik</text>
+              <text x="190" y="181" text-anchor="middle" fill="#E2E8F0" font-size="8">Uap H2O + Mikroplastik</text>
+            </svg>
+          </div>
+          <div>
+            <span class="page-kicker" style="background: var(--purple-100); color: var(--purple-600);">🌧️ Kasus 3 &bull; Klik untuk Tandai Dibaca</span>
+            <h3>Siklus Hujan Mikroplastik di Atmosfer</h3>
+            <p style="font-size: 0.88rem; color: var(--ink-700);">
+              Partikel nano/mikroplastik ringan dari serat pakaian dan debu gesekan ban terbawa arus angin naik ke lapisan troposfer, lalu turun kembali bersama tetesan hujan.
+            </p>
+            <div class="chem-reaction-box">
+              <strong>Kimia Atmosfer (Cloud Condensation Nuclei):</strong> Oksidasi fotokimia di udara membuat permukaan mikroplastik membentuk gugus polar (<span class="chem-inline">&minus;OH</span> dan <span class="chem-inline">&minus;COOH</span>). Gugus polar ini mengikat molekul uap air (<span class="chem-inline">H<sub>2</sub>O</span>) melalui <strong>ikatan hidrogen</strong> sehingga partikel plastik bertindak sebagai inti kondensasi pembentukan awan hujan!
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GATE CHALLENGE PAGE 3: ORDERING + CASE STUDY QUIZ -->
+      <div class="gate-box">
+        <div class="gate-header">
+          <h3 class="gate-title">🔐 Tantangan Pembuka Halaman 4: Urutkan Mekanisme &amp; Analisis Kasus</h3>
+          <span class="gate-status-badge" id="p3-gate-badge">Klik 3 Kasus + Urutkan + 2 Soal</span>
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <h4 style="margin-bottom: 0.35rem;">🔢 Tantangan A: Urutkan Mekanisme Kimia Degradasi Botol PET Terjemur (1 &rarr; 4)</h4>
+          <p style="font-size: 0.84rem; color: var(--ink-700); margin-bottom: 0.7rem;">
+            Gunakan tombol <strong>▲ / ▼</strong> untuk menyusun urutan yang benar (+20 Poin):
+          </p>
+          <div id="p3-order-list"></div>
+          <button class="btn-bouncy" id="btn-p3-order" onclick="verifyP3Order()">Cek Urutan Mekanisme ✓</button>
+        </div>
+
+        <div id="p3-quiz-container" style="display: grid; gap: 0.85rem;"></div>
+
+        <div class="page-nav-footer">
+          <button class="btn-bouncy secondary" onclick="goToPage(2)">⬅️ Kembali</button>
+          <button class="btn-bouncy teal" id="btn-next-3" disabled onclick="goToPage(4)">
+            Lanjut ke Halaman 4: Toksikologi Organ Tubuh ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         HALAMAN 4: DAMPAK BIOKIMIA & TOKSIKOLOGI PADA ORGAN TUBUH MANUSIA
+    ======================================================================== -->
+    <section class="lab-page" id="page-4">
+      <div class="glass-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 4 dari 6 &bull; Biokimia &amp; Toksikologi Lingkungan</span>
+            <h2>Dampak Biokimia &amp; Toksikologi pada Organ Tubuh Manusia</h2>
+          </div>
+          <div class="chem-formula-pill" id="p4-organ-counter">Organ Diamati: 1 / 4</div>
+        </div>
+
+        <div class="organ-lab-grid">
+          <!-- Cute Scientific Body Diagram -->
+          <div class="body-svg-stage">
+            <svg viewBox="0 0 220 320" width="210" height="auto" role="img" aria-label="Diagram Organ Tubuh Interaktif">
+              <!-- Silhouette -->
+              <circle cx="110" cy="42" r="24" fill="#FDE68A" stroke="#F59E0B" stroke-width="2" />
+              <path d="M72,76 C72,68 148,68 148,76 L156,185 L138,185 L136,295 L114,295 L112,205 L108,205 L106,295 L84,295 L82,185 L64,185 Z" fill="#DDD6FE" stroke="#8B5CF6" stroke-width="2" />
+
+              <!-- Hotspot 4: Endocrine / Brain-Thyroid -->
+              <g class="organ-hotspot" onclick="selectOrgan(3)">
+                <circle cx="110" cy="42" r="11" fill="#EC4899" />
+                <text x="110" y="46" text-anchor="middle" fill="#FFF" font-size="10" font-weight="800">4</text>
+              </g>
+
+              <!-- Hotspot 1: Lungs (Pernapasan) -->
+              <g class="organ-hotspot" onclick="selectOrgan(0)">
+                <ellipse cx="94" cy="108" rx="13" ry="18" fill="#0EA5E9" />
+                <ellipse cx="126" cy="108" rx="13" ry="18" fill="#0EA5E9" />
+                <text x="110" y="112" text-anchor="middle" fill="#FFF" font-size="10" font-weight="800">1</text>
+              </g>
+
+              <!-- Hotspot 3: Blood Circulation -->
+              <g class="organ-hotspot" onclick="selectOrgan(2)">
+                <circle cx="114" cy="132" r="11" fill="#EF4444" />
+                <text x="114" y="136" text-anchor="middle" fill="#FFF" font-size="10" font-weight="800">3</text>
+              </g>
+
+              <!-- Hotspot 2: Digestive -->
+              <g class="organ-hotspot" onclick="selectOrgan(1)">
+                <rect x="90" y="152" width="40" height="26" rx="10" fill="#F97316" />
+                <text x="110" y="169" text-anchor="middle" fill="#FFF" font-size="10" font-weight="800">2</text>
+              </g>
+            </svg>
+            <p style="font-size: 0.78rem; font-weight: 700; color: var(--ink-700); margin-top: 0.4rem;">
+              Klik angka 1&ndash;4 pada tubuh atau tombol organ di samping!
+            </p>
+          </div>
+
+          <!-- Organ Chemistry Details -->
+          <div class="organ-detail-card">
+            <div class="organ-pill-list" id="organ-tabs-row"></div>
+            <div id="organ-content-box"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GATE CHALLENGE PAGE 4 -->
+      <div class="gate-box">
+        <div class="gate-header">
+          <h3 class="gate-title">🔐 Tantangan Pembuka Halaman 5: Mekanisme Biokimia Toksikologi</h3>
+          <span class="gate-status-badge" id="p4-gate-badge">Klik 4 Organ + Jawab 2 Soal</span>
+        </div>
+        <div id="p4-quiz-container" style="display: grid; gap: 0.85rem;"></div>
+
+        <div class="page-nav-footer">
+          <button class="btn-bouncy secondary" onclick="goToPage(3)">⬅️ Kembali</button>
+          <button class="btn-bouncy teal" id="btn-next-4" disabled onclick="goToPage(5)">
+            Lanjut ke Halaman 5: Pojok Literasi Berita ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         HALAMAN 5: POJOK LITERASI BERITA & CEK FAKTA ILMIAH
+    ======================================================================== -->
+    <section class="lab-page" id="page-5">
+      <div class="glass-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 5 dari 6 &bull; Literasi Sains &amp; Cek Fakta</span>
+            <h2>Pojok Berita: Polimer Tak Kasat Mata di Air Hujan &amp; Darah Manusia</h2>
+          </div>
+          <div class="chem-formula-pill">Baca Artikel &amp; Cek Fakta</div>
+        </div>
+
+        <article class="newspaper-article">
+          <div class="news-masthead">
+            <div style="font-size: 0.76rem; font-weight: 800; color: #5EEAD4; margin-bottom: 0.35rem;">
+              PORTAL SAINS REMAJA &bull; JURNAL KIMIA LINGKUNGAN INDONESIA
+            </div>
+            <h3 style="font-size: 1.25rem; line-height: 1.35;">
+              Jejak Polimer di Langit dan Tubuh: Ilmuwan Deteksi Mikroplastik pada Air Hujan Perkotaan serta Sampel Darah Manusia
+            </h3>
+          </div>
+          <div class="news-body">
+            <p>
+              <strong>YOGYAKARTA &mdash;</strong> Analisis spektroskopi inframerah (FTIR) terbaru oleh tim kimia lingkungan mengungkap keberadaan partikel mikroplastik di dua lokasi mengejutkan: tetesan air hujan perkotaan dan aliran darah manusia.
+            </p>
+            <p>
+              Pada sampel air hujan, bentuk <strong>serat sintetis (fiber)</strong> dari pencucian tekstil poliester dan <strong>fragmen elastomer</strong> dari gesekan ban kendaraan mendominasi temuan. Partikel ringan yang melayang ke troposfer mengalami oksidasi fotokimia hingga permukaannya memiliki gugus polar (<span class="chem-inline">&minus;OH</span> dan <span class="chem-inline">&minus;COOH</span>). Gugus ini mengikat molekul uap air (<span class="chem-inline">H<sub>2</sub>O</span>) melalui <strong>ikatan hidrogen</strong> sehingga memicu turunnya hujan mikroplastik.
+            </p>
+            <p>
+              Sementara itu, studi biomonitoring pada sampel darah manusia mendeteksi keberadaan polimer <span class="chem-inline">PET</span>, <span class="chem-inline">PS</span>, dan <span class="chem-inline">PE</span> berukuran nano hingga mikro. Para ahli biokimia memperingatkan bahwa permukaan plastik bersifat hidrofobik sehingga mampu membawa polutan organik persisten (POPs), ion logam berat (<span class="chem-inline">Pb<sup>2+</sup></span>, <span class="chem-inline">Cd<sup>2+</sup></span>), serta senyawa pengganggu hormon seperti Bisphenol-A (<span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>).
+            </p>
+          </div>
+        </article>
+      </div>
+
+      <!-- GATE CHALLENGE PAGE 5 -->
+      <div class="gate-box">
+        <div class="gate-header">
+          <h3 class="gate-title">🔐 Tantangan Pembuka Halaman 6: Cek Fakta Literasi Berita</h3>
+          <span class="gate-status-badge" id="p5-gate-badge">Wajib Selesai (0/2)</span>
+        </div>
+        <div id="p5-quiz-container" style="display: grid; gap: 0.85rem;"></div>
+
+        <div class="page-nav-footer">
+          <button class="btn-bouncy secondary" onclick="goToPage(4)">⬅️ Kembali</button>
+          <button class="btn-bouncy teal" id="btn-next-5" disabled onclick="goToPage(6)">
+            Lanjut ke Halaman 6: Evaluasi Akhir &amp; Sertifikat ➡️
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =======================================================================
+         HALAMAN 6: EVALUASI AKHIR & SERTIFIKAT PRAKTIKAN KIMIA
+    ======================================================================== -->
+    <section class="lab-page" id="page-6">
+      <div class="glass-card" id="p6-eval-card">
+        <div class="page-header-banner">
+          <div>
+            <span class="page-kicker">Halaman 6 dari 6 &bull; Evaluasi Akhir &amp; Sertifikat</span>
+            <h2>Uji Kompetensi Kimia Lingkungan &amp; Klaim Sertifikat</h2>
+          </div>
+          <div class="chem-formula-pill" id="p6-eval-counter">Evaluasi: 0 / 3 Soal</div>
+        </div>
+        <p style="font-size: 0.9rem; color: var(--ink-700); margin-bottom: 1rem;">
+          Selesaikan 3 soal sintesis kimia akhir di bawah ini (benar = <strong>+20 Poin</strong>, salah = +0 poin tanpa pengurangan negatif) untuk menerbitkan <strong>Sertifikat Praktikan Kimia</strong> resmimu!
+        </p>
+        <div id="p6-final-quiz" style="display: grid; gap: 0.85rem;"></div>
+      </div>
+
+      <!-- CERTIFICATE PANEL (LOCKED UNTIL 3 FINAL QUESTIONS SOLVED) -->
+      <div class="cert-frame" id="cert-printable" style="display: none;">
+        <div style="font-size: 3rem; margin-bottom: 0.3rem;">🏅🧪🌿</div>
+        <span class="welcome-pill">SERTIFIKAT PRAKTIKAN KIMIA LINGKUNGAN SMA KELAS X</span>
+        <h2 style="font-size: 1.55rem; color: var(--ink-900);">Diberikan Kepada:</h2>
+        <div class="cert-name" id="cert-student-name">Siswa SMA Kelas X</div>
+        <div style="font-weight: 800; color: var(--ink-700);" id="cert-student-class">Kelas X</div>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin: 1.25rem 0;">
+          <div class="student-tag" style="font-size: 0.92rem;">Total Skor Akhir: <strong style="color: var(--coral-600);" id="cert-total-points">0 Poin Kimia</strong></div>
+          <div class="student-tag" style="font-size: 0.92rem;">Gelar Kehormatan: <strong style="color: var(--teal-600);" id="cert-rank-title">Duta Kimia Hijau &amp; Bebas Mikroplastik</strong></div>
+        </div>
+
+        <p style="max-width: 640px; margin: 0 auto 1.4rem; font-size: 0.9rem; color: var(--ink-700);">
+          Telah menuntaskan seluruh misi investigasi kimia mengenai klasifikasi polimer plastik (<span class="chem-inline">PET</span>, <span class="chem-inline">HDPE</span>, <span class="chem-inline">PVC</span>, <span class="chem-inline">LDPE</span>, <span class="chem-inline">PP</span>, <span class="chem-inline">PS</span>), mekanisme fotodegradasi radikal bebas, pelindian aditif botol terjemur, abrasi talenan plastik, hujan mikroplastik, serta toksikologi biokimia pada tubuh manusia.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0.75rem; text-align: left; margin-bottom: 1.5rem;">
+          <div style="background: #FFFFFF; padding: 0.9rem; border-radius: 16px; border: 2px solid #CCFBF1;">
+            <strong>🪵 Ganti Talenan Plastik</strong>
+            <p style="font-size: 0.8rem; color: var(--ink-700);">Gunakan talenan kayu keras atau kaca untuk mencegah abrasi serpihan <span class="chem-inline">(C<sub>3</sub>H<sub>6</sub>)<sub>n</sub></span>.</p>
+          </div>
+          <div style="background: #FFFFFF; padding: 0.9rem; border-radius: 16px; border: 2px solid #EDE9FE;">
+            <strong>🧴 Hindari Botol Terjemur</strong>
+            <p style="font-size: 0.8rem; color: var(--ink-700);">Jangan meminum air botol PET berembun panas (&gt;45&deg;C) yang melepas BPA &amp; <span class="chem-inline">Sb<sub>2</sub>O<sub>3</sub></span>.</p>
+          </div>
+          <div style="background: #FFFFFF; padding: 0.9rem; border-radius: 16px; border: 2px solid #E0F2FE;">
+            <strong>🥤 Tumbler Stainless/Kaca</strong>
+            <p style="font-size: 0.8rem; color: var(--ink-700);">Stabil secara termal dan bebas pelindian aditif pengganggu hormon.</p>
+          </div>
+        </div>
+
+        <div class="no-print" style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-bouncy secondary" onclick="goToPage(5)">⬅️ Kembali ke Literasi Berita</button>
+          <button class="btn-bouncy teal" onclick="window.print()">🖨️ Cetak / Simpan Sertifikat (PDF)</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+       JAVASCRIPT LOGIC: GATED PROGRESSION, +20 SCORING & INTERACTIVE GAMES
+  ========================================================================== -->
+  <script>
+    /* -------------------------------------------------------------------------
+       GLOBAL STATE
+    ------------------------------------------------------------------------- */
+    const state = {
+      name: 'Siswa SMA Kelas X',
+      studentClass: 'Kelas X',
+      points: 0,
+      currentPage: 1,
+      unlockedPage: 1,
+      completedPages: {},
+
+      // Page 1 state
+      p1Sorted: 0,
+
+      // Page 2 state
+      p2MatchSolved: 0,
+
+      // Page 3 state
+      p3Inspected: { 1: false, 2: false, 3: false },
+      p3OrderSolved: false,
+      p3QuizSolved: 0,
+
+      // Page 4 state
+      p4OrgansVisited: { 0: true, 1: false, 2: false, 3: false },
+      p4QuizSolved: 0,
+
+      // Page 5 state
+      p5QuizSolved: 0,
+
+      // Page 6 state
+      p6EvalSolved: 0
+    };
+
+    const pageTitles = [
+      '1. Primer/Sekunder',
+      '2. Bentuk & Polimer',
+      '3. 3 Studi Kasus',
+      '4. Toksikologi Organ',
+      '5. Literasi Berita',
+      '6. Sertifikat Akhir'
+    ];
+
+    /* -------------------------------------------------------------------------
+       WELCOME FORM & SCORE HUD (+20 CORRECT / +0 WRONG)
+    ------------------------------------------------------------------------- */
+    document.getElementById('entry-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const n = document.getElementById('student-name-input').value.trim();
+      const c = document.getElementById('student-class-input').value.trim();
+      if (!n || !c) return;
+
+      state.name = n;
+      state.studentClass = c;
+      updateHUD();
+      document.getElementById('welcome-screen').classList.add('hidden');
+      showToast(`Selamat datang di ChemPlast Lab, ${n}! Selesaikan tantangan Halaman 1 untuk membuka Halaman 2.`, 'good');
+    });
+
+    function updateHUD() {
+      document.getElementById('hud-name-class').textContent = `👩‍🔬 ${state.name} • ${state.studentClass}`;
+      document.getElementById('hud-points').textContent = state.points;
+
+      document.getElementById('cert-student-name').textContent = state.name;
+      document.getElementById('cert-student-class').textContent = state.studentClass;
+      document.getElementById('cert-total-points').textContent = `${state.points} Poin Kimia`;
+      document.getElementById('cert-rank-title').textContent = 'Duta Kimia Hijau & Bebas Mikroplastik';
+    }
+
+    function addPoints(pts, msg) {
+      state.points += pts;
+      updateHUD();
+      showToast(`+${pts} Poin Kimia! ${msg}`, 'good');
+    }
+
+    function showToast(text, type = 'good') {
+      const el = document.getElementById('toast-msg');
+      el.textContent = text;
+      el.className = `show ${type}`;
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove('show'), 3600);
+    }
+
+    /* -------------------------------------------------------------------------
+       STEPPER & GATED PAGE NAVIGATION
+    ------------------------------------------------------------------------- */
+    function renderStepper() {
+      const nav = document.getElementById('stepper-nav');
+      nav.innerHTML = '';
+      pageTitles.forEach((label, idx) => {
+        const pageNum = idx + 1;
+        const btn = document.createElement('button');
+        btn.className = 'step-pill';
+
+        if (pageNum === state.currentPage) {
+          btn.classList.add('active');
+          btn.textContent = label;
+        } else if (state.completedPages[pageNum]) {
+          btn.classList.add('completed');
+          btn.textContent = `✓ ${label}`;
+        } else if (pageNum <= state.unlockedPage) {
+          btn.classList.add('unlocked');
+          btn.textContent = label;
+        } else {
+          btn.classList.add('locked');
+          btn.textContent = `🔒 ${pageNum}`;
+        }
+
+        btn.onclick = () => {
+          if (pageNum <= state.unlockedPage) {
+            goToPage(pageNum);
+          } else {
+            showToast(`Halaman ${pageNum} masih terkunci! Selesaikan dulu tantangan di Halaman ${state.currentPage}.`, 'warn');
+          }
+        };
+        nav.appendChild(btn);
+      });
+    }
+
+    function goToPage(pageNum) {
+      if (pageNum > state.unlockedPage) return;
+      state.currentPage = pageNum;
+
+      document.querySelectorAll('.lab-page').forEach(p => p.classList.remove('active'));
+      document.getElementById(`page-${pageNum}`).classList.add('active');
+      renderStepper();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function unlockNextPage(currentNum, nextBtnId, statusBadgeId) {
+      state.completedPages[currentNum] = true;
+      if (state.unlockedPage < currentNum + 1) {
+        state.unlockedPage = currentNum + 1;
+      }
+      const nextBtn = document.getElementById(nextBtnId);
+      if (nextBtn) nextBtn.disabled = false;
+
+      const badge = document.getElementById(statusBadgeId);
+      if (badge) {
+        badge.textContent = '✓ Terbuka! Silakan Lanjut';
+        badge.classList.add('unlocked');
+      }
+      renderStepper();
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 1: TABS & PRIMER VS SEKUNDER GATE CHALLENGE
+    ------------------------------------------------------------------------- */
+    function switchP1Tab(idx) {
+      document.getElementById('p1-tab-0').style.display = idx === 0 ? 'block' : 'none';
+      document.getElementById('p1-tab-1').style.display = idx === 1 ? 'block' : 'none';
+      document.getElementById('p1-tab-btn-0').classList.toggle('active', idx === 0);
+      document.getElementById('p1-tab-btn-1').classList.toggle('active', idx === 1);
+    }
+
+    const p1SortItems = [
+      { html: 'Butiran microbeads polietilena (<span class="chem-inline">PE</span>) dalam sabun cuci muka scrub', answer: 'primer' },
+      { html: 'Serpihan botol PET (<span class="chem-inline">(C<sub>10</sub>H<sub>8</sub>O<sub>4</sub>)<sub>n</sub></span>) yang rapuh akibat fotodegradasi UV', answer: 'sekunder' },
+      { html: 'Biji plastik silinder (nurdles) bahan baku pabrik pencetakan plastik', answer: 'primer' },
+      { html: 'Serat poliester yang terlepas saat mencuci pakaian olahraga', answer: 'sekunder' }
+    ];
+
+    function initPage1() {
+      const grid = document.getElementById('p1-sort-grid');
+      p1SortItems.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'sort-item-card';
+        card.id = `p1-card-${idx}`;
+        card.innerHTML = `
+          <div style="font-weight: 700; font-size: 0.88rem;">${item.html}</div>
+          <div class="sort-btn-pair">
+            <button class="mini-choice-btn" onclick="checkP1Sort(${idx}, 'primer')">🔵 Primer</button>
+            <button class="mini-choice-btn" onclick="checkP1Sort(${idx}, 'sekunder')">🟠 Sekunder</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function checkP1Sort(idx, chosen) {
+      const card = document.getElementById(`p1-card-${idx}`);
+      if (card.classList.contains('done')) return;
+
+      if (chosen === p1SortItems[idx].answer) {
+        card.classList.add('done');
+        card.querySelectorAll('button').forEach(b => (b.disabled = true));
+        state.p1Sorted++;
+        document.getElementById('p1-gate-badge').textContent = `Selesai (${state.p1Sorted}/4)`;
+        addPoints(20, 'Klasifikasi mikroplastik tepat!');
+
+        if (state.p1Sorted === 4) {
+          unlockNextPage(1, 'btn-next-1', 'p1-gate-badge');
+        }
+      } else {
+        card.classList.add('wiggle');
+        setTimeout(() => card.classList.remove('wiggle'), 400);
+        showToast('Kurang tepat (+0 Poin). Ingat: Primer = dibuat mikro dari pabrik; Sekunder = pecahan plastik besar.', 'warn');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 2: MATCHING RESIN CODE, FORMULA & CHEMICAL PROPERTIES
+    ------------------------------------------------------------------------- */
+    const p2Matches = [
+      { id: 'pet', left: 'Kode #1 • PET (Polietilena Tereftalat)', right: '(C<sub>10</sub>H<sub>8</sub>O<sub>4</sub>)<sub>n</sub> — Gugus ester (-COO-), mudah terhidrolisis saat panas' },
+      { id: 'pvc', left: 'Kode #3 • PVC (Polivinil Klorida)', right: '(C<sub>2</sub>H<sub>3</sub>Cl)<sub>n</sub> — Mengandung atom klorin (Cl) & aditif ftalat' },
+      { id: 'pp', left: 'Kode #5 • PP (Polipropilena)', right: '(C<sub>3</sub>H<sub>6</sub>)<sub>n</sub> — Memiliki gugus metil (-CH<sub>3</sub>), bahan talenan plastik' },
+      { id: 'ps', left: 'Kode #6 • PS (Polistirena)', right: '(C<sub>8</sub>H<sub>8</sub>)<sub>n</sub> — Cincin benzena aromatik, melepas stirena saat panas' }
+    ];
+    let p2SelectedLeft = null;
+
+    function initPage2() {
+      const leftCol = document.getElementById('p2-match-left');
+      const rightCol = document.getElementById('p2-match-right');
+
+      p2Matches.forEach(m => {
+        const b = document.createElement('button');
+        b.className = 'match-tile';
+        b.dataset.id = m.id;
+        b.innerHTML = m.left;
+        b.onclick = () => {
+          if (b.classList.contains('matched')) return;
+          leftCol.querySelectorAll('.match-tile').forEach(el => el.classList.remove('selected'));
+          b.classList.add('selected');
+          p2SelectedLeft = b;
+        };
+        leftCol.appendChild(b);
+      });
+
+      [...p2Matches].sort(() => Math.random() - 0.5).forEach(m => {
+        const b = document.createElement('button');
+        b.className = 'match-tile';
+        b.dataset.id = m.id;
+        b.innerHTML = m.right;
+        b.onclick = () => {
+          if (b.classList.contains('matched')) return;
+          if (!p2SelectedLeft) {
+            showToast('Pilih dulu kartu Kode Polimer di kolom kiri!', 'warn');
+            return;
+          }
+          if (p2SelectedLeft.dataset.id === b.dataset.id) {
+            p2SelectedLeft.classList.remove('selected');
+            p2SelectedLeft.classList.add('matched');
+            b.classList.add('matched');
+            p2SelectedLeft = null;
+            state.p2MatchSolved++;
+            document.getElementById('p2-gate-badge').textContent = `Selesai (${state.p2MatchSolved}/4)`;
+            addPoints(20, 'Rumus unit dan sifat kimia polimer cocok!');
+            if (state.p2MatchSolved === 4) {
+              unlockNextPage(2, 'btn-next-2', 'p2-gate-badge');
+            }
+          } else {
+            b.classList.add('wiggle');
+            setTimeout(() => b.classList.remove('wiggle'), 400);
+            showToast('Belum cocok (+0 Poin). Cek kembali rumus unit polimer di kartu atas!', 'warn');
+          }
+        };
+        rightCol.appendChild(b);
+      });
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 3: 3 CASE STUDIES INSPECTION, ORDERING & QUIZ
+    ------------------------------------------------------------------------- */
+    function inspectCase(num) {
+      if (!state.p3Inspected[num]) {
+        state.p3Inspected[num] = true;
+        document.getElementById(`case-card-${num}`).classList.add('inspected');
+        const count = Object.values(state.p3Inspected).filter(Boolean).length;
+        document.getElementById('p3-inspect-counter').textContent = `Diinspeksi: ${count} / 3 Kasus`;
+        addPoints(20, `Studi Kasus ${num} berhasil diinspeksi!`);
+        checkP3Complete();
+      }
+    }
+
+    const correctP3Order = [
+      { id: 1, html: 'Botol PET terpapar radiasi foton UV dan suhu panas matahari (&gt; 45&deg;C)' },
+      { id: 2, html: 'Energi kalor &amp; foton memicu fotodegradasi serta hidrolisis gugus ester (<span class="chem-inline">&minus;COO&minus;</span>)' },
+      { id: 3, html: 'Rantai polimer <span class="chem-inline">(C<sub>10</sub>H<sub>8</sub>O<sub>4</sub>)<sub>n</sub></span> terputus dan meluruhkan aditif BPA (<span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>) serta <span class="chem-inline">Sb<sub>2</sub>O<sub>3</sub></span>' },
+      { id: 4, html: 'Fragmen mikroplastik dan zat terlarut masuk ke air minum yang berembun' }
+    ];
+
+    let p3CurrentOrder = [
+      correctP3Order[2],
+      correctP3Order[0],
+      correctP3Order[3],
+      correctP3Order[1]
+    ];
+
+    function renderP3Order() {
+      const list = document.getElementById('p3-order-list');
+      list.innerHTML = '';
+      p3CurrentOrder.forEach((item, idx) => {
+        const row = document.createElement('div');
+        row.className = 'order-item-row';
+        if (state.p3OrderSolved) {
+          row.style.background = '#DCFCE7';
+          row.style.borderColor = '#22C55E';
+        }
+        row.innerHTML = `
+          <span style="font-weight:700; font-size:0.86rem;"><strong>${idx + 1}.</strong> ${item.html}</span>
+          ${state.p3OrderSolved ? '<span>✅</span>' : `
+          <div style="display:flex; gap:0.3rem;">
+            <button class="mini-choice-btn" onclick="moveP3Order(${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>▲</button>
+            <button class="mini-choice-btn" onclick="moveP3Order(${idx}, 1)" ${idx === 3 ? 'disabled' : ''}>▼</button>
+          </div>`}
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function moveP3Order(idx, dir) {
+      if (state.p3OrderSolved) return;
+      const target = idx + dir;
+      if (target < 0 || target > 3) return;
+      [p3CurrentOrder[idx], p3CurrentOrder[target]] = [p3CurrentOrder[target], p3CurrentOrder[idx]];
+      renderP3Order();
+    }
+
+    function verifyP3Order() {
+      if (state.p3OrderSolved) return;
+      const ok = p3CurrentOrder.every((item, i) => item.id === correctP3Order[i].id);
+      if (ok) {
+        state.p3OrderSolved = true;
+        renderP3Order();
+        document.getElementById('btn-p3-order').disabled = true;
+        document.getElementById('btn-p3-order').textContent = '✓ Urutan Mekanisme Tepat!';
+        addPoints(20, 'Urutan mekanisme degradasi botol PET benar!');
+        checkP3Complete();
+      } else {
+        showToast('Urutan mekanisme belum tepat (+0 Poin). Mulai dari paparan energi UV dan suhu panas terlebih dahulu!', 'warn');
+      }
+    }
+
+    const p3Questions = [
+      {
+        q: '1. Mengapa serpihan talenan plastik PP (<span class="chem-inline">(C<sub>3</sub>H<sub>6</sub>)<sub>n</sub></span>) mudah menempel pada potongan daging atau ikan berlemak?',
+        opts: [
+          'Prinsip Like Dissolves Like: polimer PP dan lemak sama-sama bersifat hidrofobik (non-polar)',
+          'Polimer PP membentuk ikatan logam dengan air cucian daging'
+        ],
+        correct: 0
+      },
+      {
+        q: '2. Bagaimana partikel mikroplastik di troposfer dapat memicu turunnya hujan mikroplastik?',
+        opts: [
+          'Plastik berubah menjadi gas nitrogen di lapisan awan',
+          'Gugus polar hasil oksidasi UV mengikat uap air (<span class="chem-inline">H<sub>2</sub>O</span>) melalui ikatan hidrogen sebagai inti kondensasi awan'
+        ],
+        correct: 1
+      }
+    ];
+
+    function initPage3() {
+      renderP3Order();
+      const container = document.getElementById('p3-quiz-container');
+      p3Questions.forEach((item, qIdx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'background:#fff; padding:1rem; border-radius:16px; border:2px solid #DDD6FE;';
+        box.id = `p3-q-${qIdx}`;
+        box.innerHTML = `
+          <p style="font-weight:700; font-size:0.9rem; margin-bottom:0.6rem;">${item.q}</p>
+          <div style="display:grid; gap:0.45rem;">
+            ${item.opts.map((opt, oIdx) => `
+              <button class="mini-choice-btn" style="text-align:left; padding:0.65rem 0.9rem;" onclick="checkP3Answer(${qIdx}, ${oIdx}, this)">${opt}</button>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function checkP3Answer(qIdx, oIdx, btn) {
+      const box = document.getElementById(`p3-q-${qIdx}`);
+      if (box.dataset.solved) return;
+
+      if (oIdx === p3Questions[qIdx].correct) {
+        box.dataset.solved = '1';
+        box.style.borderColor = '#22C55E';
+        box.style.background = '#F0FDF4';
+        btn.style.background = '#16A34A';
+        btn.style.color = '#FFF';
+        box.querySelectorAll('button').forEach(b => (b.disabled = true));
+        state.p3QuizSolved++;
+        addPoints(20, 'Analisis studi kasus kimia tepat!');
+        checkP3Complete();
+      } else {
+        btn.disabled = true;
+        btn.style.background = '#FEE2E2';
+        btn.style.color = '#B91C1C';
+        showToast('Kurang tepat (+0 Poin). Perhatikan kotak mekanisme kimia pada masing-masing kasus!', 'warn');
+      }
+    }
+
+    function checkP3Complete() {
+      const allInspected = Object.values(state.p3Inspected).every(Boolean);
+      if (allInspected && state.p3OrderSolved && state.p3QuizSolved === 2) {
+        unlockNextPage(3, 'btn-next-3', 'p3-gate-badge');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 4: HUMAN ORGAN BIOCHEMICAL TOXICOLOGY
+    ------------------------------------------------------------------------- */
+    const organsData = [
+      {
+        title: '1. Sistem Pernapasan (Paru-paru & Alveolus)',
+        chemTitle: 'Mekanisme Biokimia: Stres Oksidatif & Pembentukan ROS',
+        eq: 'O<sub>2</sub> &rarr; <span class="eq-radical">O<sub>2</sub><sup>&bull;&minus;</sup></span> (superoksida) &rarr; <span class="eq-highlight">H<sub>2</sub>O<sub>2</sub></span> &rarr; <span class="eq-radical">&bull;OH</span> (radikal hidroksil)',
+        desc: 'Serat mikroplastik (<em>microfiber</em>) yang terhirup hingga alveolus memicu respons imun sel makrofag menghasilkan <strong>Reactive Oxygen Species (ROS)</strong> seperti radikal hidroksil (<span class="chem-inline">&bull;OH</span>), anion superoksida (<span class="chem-inline">O<sub>2</sub><sup>&bull;&minus;</sup></span>), dan hidrogen peroksida (<span class="chem-inline">H<sub>2</sub>O<sub>2</sub></span>). Spesies radikal bebas ini memicu peroksidasi lipid yang merusak membran sel paru.'
+      },
+      {
+        title: '2. Sistem Pencernaan (Lambung & Usus)',
+        chemTitle: 'Mekanisme Kimia: Pelindian Aditif dalam Asam Lambung (pH 1,5 &ndash; 3,5)',
+        eq: 'Polimer + Aditif + <span class="eq-highlight">HCl</span><sub>(aq)</sub> (pH rendah) &rarr; pelindian ftalat &amp; iritasi mukosa usus',
+        desc: 'Mikroplastik yang tertelan bersama makanan berada dalam lingkungan asam kuat (<span class="chem-inline">HCl</span>) di lambung. Kondisi pH rendah dan aktivitas enzim mempercepat pelepasan aditif pelentur ftalat, mengiritasi epitel usus, serta mengganggu keseimbangan mikrobiota saluran cerna.'
+      },
+      {
+        title: '3. Pembuluh Darah (Efek Vektor / "Kuda Troya" Kimia)',
+        chemTitle: 'Mekanisme Kimia: Adsorpsi Hidrofobik POPs & Ion Logam Berat',
+        eq: 'Permukaan Non-Polar + <span class="eq-highlight">POPs</span> + <span class="eq-radical">Pb<sup>2+</sup> / Cd<sup>2+</sup> / Hg<sup>2+</sup></span> &rarr; masuk sirkulasi darah',
+        desc: 'Partikel nano/mikroplastik yang menembus dinding usus ke pembuluh darah memiliki permukaan <strong>hidrofobik/lipofilik</strong>. Melalui gaya van der Waals dan interaksi hidrofobik, permukaannya menyerap polutan organik persisten (POPs) serta mengikat ion logam berat beracun (<span class="chem-inline">Pb<sup>2+</sup></span>, <span class="chem-inline">Cd<sup>2+</sup></span>, <span class="chem-inline">Hg<sup>2+</sup></span>) dan mengantarkannya ke seluruh organ.'
+      },
+      {
+        title: '4. Sistem Endokrin / Hormon (EDCs)',
+        chemTitle: 'Mekanisme Biokimia: Mimikri Molekuler BPA terhadap Estrogen',
+        eq: 'BPA (<span class="eq-highlight">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>) &approx; struktur cincin fenolik Estrogen (<span class="eq-highlight">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span>)',
+        desc: 'Senyawa aditif Bisphenol-A / BPA (<span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>) termasuk <em>Endocrine Disrupting Chemicals (EDCs)</em>. Struktur dua cincin fenoliknya sangat mirip dengan hormon estrogen alami (<span class="chem-inline">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span>) sehingga mampu mengikat reseptor hormon di dalam sel dan mengacaukan regulasi metabolisme maupun reproduksi.'
+      }
+    ];
+
+    const p4Questions = [
+      {
+        q: '1. Spesies oksigen reaktif (ROS) berikut yang dihasilkan akibat stres oksidatif mikroplastik pada sel alveolus paru-paru adalah...',
+        opts: [
+          'Radikal hidroksil (<span class="chem-inline">&bull;OH</span>), anion superoksida (<span class="chem-inline">O<sub>2</sub><sup>&bull;&minus;</sup></span>), dan <span class="chem-inline">H<sub>2</sub>O<sub>2</sub></span>',
+          'Gas mulia neon (<span class="chem-inline">Ne</span>) dan argon (<span class="chem-inline">Ar</span>)'
+        ],
+        correct: 0
+      },
+      {
+        q: '2. Mengapa senyawa Bisphenol-A (<span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span>) disebut sebagai pengganggu sistem endokrin (EDCs)?',
+        opts: [
+          'Karena menurunkan suhu darah di pembuluh vena',
+          'Karena kemiripan struktur cincin fenolik BPA dengan hormon estrogen (<span class="chem-inline">C<sub>18</sub>H<sub>24</sub>O<sub>2</sub></span>) sehingga berikatan dengan reseptor hormon'
+        ],
+        correct: 1
+      }
+    ];
+
+    function initPage4() {
+      const row = document.getElementById('organ-tabs-row');
+      organsData.forEach((org, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `organ-btn ${idx === 0 ? 'active visited' : ''}`;
+        btn.id = `organ-btn-${idx}`;
+        btn.textContent = org.title.split('(')[0].trim();
+        btn.onclick = () => selectOrgan(idx);
+        row.appendChild(btn);
+      });
+      selectOrgan(0);
+
+      const qContainer = document.getElementById('p4-quiz-container');
+      p4Questions.forEach((item, qIdx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'background:#fff; padding:1rem; border-radius:16px; border:2px solid #DDD6FE;';
+        box.id = `p4-q-${qIdx}`;
+        box.innerHTML = `
+          <p style="font-weight:700; font-size:0.9rem; margin-bottom:0.6rem;">${item.q}</p>
+          <div style="display:grid; gap:0.45rem;">
+            ${item.opts.map((opt, oIdx) => `
+              <button class="mini-choice-btn" style="text-align:left; padding:0.65rem 0.9rem;" onclick="checkP4Answer(${qIdx}, ${oIdx}, this)">${opt}</button>
+            `).join('')}
+          </div>
+        `;
+        qContainer.appendChild(box);
+      });
+    }
+
+    function selectOrgan(idx) {
+      state.p4OrgansVisited[idx] = true;
+      document.querySelectorAll('.organ-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+        if (state.p4OrgansVisited[i]) b.classList.add('visited');
+      });
+
+      const visitedCount = Object.values(state.p4OrgansVisited).filter(Boolean).length;
+      document.getElementById('p4-organ-counter').textContent = `Organ Diamati: ${visitedCount} / 4`;
+
+      const o = organsData[idx];
+      document.getElementById('organ-content-box').innerHTML = `
+        <h3 style="color: var(--purple-600); margin-bottom: 0.45rem;">${o.title}</h3>
+        <div class="chem-equation-box" style="margin-bottom: 0.75rem;">
+          <span class="eq-label">${o.chemTitle}</span>
+          ${o.eq}
+        </div>
+        <p style="font-size: 0.9rem; color: var(--ink-700);">${o.desc}</p>
+      `;
+      checkP4Complete();
+    }
+
+    function checkP4Answer(qIdx, oIdx, btn) {
+      const box = document.getElementById(`p4-q-${qIdx}`);
+      if (box.dataset.solved) return;
+
+      if (oIdx === p4Questions[qIdx].correct) {
+        box.dataset.solved = '1';
+        box.style.borderColor = '#22C55E';
+        box.style.background = '#F0FDF4';
+        btn.style.background = '#16A34A';
+        btn.style.color = '#FFF';
+        box.querySelectorAll('button').forEach(b => (b.disabled = true));
+        state.p4QuizSolved++;
+        addPoints(20, 'Analisis biokimia toksikologi tepat!');
+        checkP4Complete();
+      } else {
+        btn.disabled = true;
+        btn.style.background = '#FEE2E2';
+        btn.style.color = '#B91C1C';
+        showToast('Kurang tepat (+0 Poin). Klik keempat organ di atas untuk membaca mekanisme biokimianya!', 'warn');
+      }
+    }
+
+    function checkP4Complete() {
+      const allVisited = Object.values(state.p4OrgansVisited).every(Boolean);
+      if (allVisited && state.p4QuizSolved === 2) {
+        unlockNextPage(4, 'btn-next-4', 'p4-gate-badge');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 5: LITERASI BERITA CHECK
+    ------------------------------------------------------------------------- */
+    const p5Questions = [
+      {
+        q: '1. Berdasarkan berita di atas, ikatan kimia apa yang terbentuk antara gugus polar mikroplastik di awan dengan molekul uap air (<span class="chem-inline">H<sub>2</sub>O</span>)?',
+        opts: ['Ikatan logam', 'Ikatan hidrogen', 'Ikatan ionik'],
+        correct: 1
+      },
+      {
+        q: '2. Mengapa permukaan mikroplastik di dalam darah dapat membawa polutan organik persisten (POPs) dan logam berat (<span class="chem-inline">Pb<sup>2+</sup></span>, <span class="chem-inline">Cd<sup>2+</sup></span>)?',
+        opts: ['Karena sifat permukaan plastik yang hidrofobik dan mampu mengadsorpsi polutan', 'Karena plastik larut sempurna menjadi air murni dalam darah'],
+        correct: 0
+      }
+    ];
+
+    function initPage5() {
+      const container = document.getElementById('p5-quiz-container');
+      p5Questions.forEach((item, qIdx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'background:#fff; padding:1rem; border-radius:16px; border:2px solid #DDD6FE;';
+        box.id = `p5-q-${qIdx}`;
+        box.innerHTML = `
+          <p style="font-weight:700; font-size:0.9rem; margin-bottom:0.6rem;">${item.q}</p>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${item.opts.map((opt, oIdx) => `
+              <button class="mini-choice-btn" style="padding:0.55rem 0.9rem;" onclick="checkP5Answer(${qIdx}, ${oIdx}, this)">${opt}</button>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function checkP5Answer(qIdx, oIdx, btn) {
+      const box = document.getElementById(`p5-q-${qIdx}`);
+      if (box.dataset.solved) return;
+
+      if (oIdx === p5Questions[qIdx].correct) {
+        box.dataset.solved = '1';
+        box.style.borderColor = '#22C55E';
+        box.style.background = '#F0FDF4';
+        btn.style.background = '#16A34A';
+        btn.style.color = '#FFF';
+        box.querySelectorAll('button').forEach(b => (b.disabled = true));
+
+        state.p5QuizSolved++;
+        document.getElementById('p5-gate-badge').textContent = `Selesai (${state.p5QuizSolved}/2)`;
+        addPoints(20, 'Cek fakta literasi berita benar!');
+
+        if (state.p5QuizSolved === 2) {
+          unlockNextPage(5, 'btn-next-5', 'p5-gate-badge');
+        }
+      } else {
+        btn.disabled = true;
+        btn.style.background = '#FEE2E2';
+        btn.style.color = '#B91C1C';
+        showToast('Belum tepat (+0 Poin). Coba baca kembali paragraf 2 dan 3 berita di atas!', 'warn');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       PAGE 6: FINAL EVALUATION & PRINTABLE CERTIFICATE
+    ------------------------------------------------------------------------- */
+    const p6FinalQuestions = [
+      {
+        q: '1. Polimer plastik berkode #3 yang memiliki rumus unit berulang <span class="chem-inline">(C<sub>2</sub>H<sub>3</sub>Cl)<sub>n</sub></span> serta mengandung atom klorin dan pelentur ftalat adalah...',
+        opts: ['PVC (Polivinil Klorida)', 'HDPE (High-Density Polyethylene)', 'PP (Polipropilena)'],
+        correct: 0
+      },
+      {
+        q: '2. Langkah kimia paling tepat untuk mencegah pelindian katalis <span class="chem-inline">Sb<sub>2</sub>O<sub>3</sub></span> dan aditif <span class="chem-inline">C<sub>15</sub>H<sub>16</sub>O<sub>2</sub></span> (BPA) ke dalam air minum saat bepergian di cuaca terik adalah...',
+        opts: [
+          'Menggunakan botol kaca borosilikat atau stainless steel yang stabil secara termal',
+          'Menjemur botol PET di dasbor mobil agar steril oleh sinar UV'
+        ],
+        correct: 0
+      },
+      {
+        q: '3. Di perairan laut (&rho;<sub>air laut</sub> &approx; 1,02 g/cm<sup>3</sup>), partikel mikroplastik polietilena tereftalat / PET (&rho; &approx; 1,38 g/cm<sup>3</sup>) akan mengalami...',
+        opts: [
+          'Pengapungan permanen di permukaan air',
+          'Pengendapan (sedimentasi) menuju dasar perairan karena massa jenisnya lebih besar dari air laut'
+        ],
+        correct: 1
+      }
+    ];
+
+    function initPage6() {
+      const container = document.getElementById('p6-final-quiz');
+      p6FinalQuestions.forEach((item, qIdx) => {
+        const box = document.createElement('div');
+        box.style.cssText = 'background:#fff; padding:1rem; border-radius:16px; border:2px solid #DDD6FE;';
+        box.id = `p6-fq-${qIdx}`;
+        box.innerHTML = `
+          <p style="font-weight:700; font-size:0.9rem; margin-bottom:0.6rem;">${item.q}</p>
+          <div style="display:grid; gap:0.45rem;">
+            ${item.opts.map((opt, oIdx) => `
+              <button class="mini-choice-btn" style="text-align:left; padding:0.65rem 0.9rem;" onclick="checkP6Final(${qIdx}, ${oIdx}, this)">${opt}</button>
+            `).join('')}
+          </div>
+        `;
+        container.appendChild(box);
+      });
+    }
+
+    function checkP6Final(qIdx, oIdx, btn) {
+      const box = document.getElementById(`p6-fq-${qIdx}`);
+      if (box.dataset.solved) return;
+
+      if (oIdx === p6FinalQuestions[qIdx].correct) {
+        box.dataset.solved = '1';
+        box.style.borderColor = '#22C55E';
+        box.style.background = '#F0FDF4';
+        btn.style.background = '#16A34A';
+        btn.style.color = '#FFF';
+        box.querySelectorAll('button').forEach(b => (b.disabled = true));
+
+        state.p6EvalSolved++;
+        document.getElementById('p6-eval-counter').textContent = `Evaluasi: ${state.p6EvalSolved} / 3 Soal`;
+        addPoints(20, 'Jawaban evaluasi akhir tepat!');
+
+        if (state.p6EvalSolved === 3) {
+          state.completedPages[6] = true;
+          renderStepper();
+          const certEl = document.getElementById('cert-printable');
+          certEl.style.display = 'block';
+          certEl.scrollIntoView({ behavior: 'smooth' });
+          showToast('Selamat! Sertifikat Praktikan Kimia Lingkungan telah terbit!', 'good');
+        }
+      } else {
+        btn.disabled = true;
+        btn.style.background = '#FEE2E2';
+        btn.style.color = '#B91C1C';
+        showToast('Kurang tepat (+0 Poin). Coba pilih jawaban kimia yang paling akurat!', 'warn');
+      }
+    }
+
+    /* -------------------------------------------------------------------------
+       INITIALIZE ALL STAGES ON LOAD
+    ------------------------------------------------------------------------- */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderStepper();
+      initPage1();
+      initPage2();
+      initPage3();
+      initPage4();
+      initPage5();
+      initPage6();
+    });
+  </script>
+</body>
+</html>
